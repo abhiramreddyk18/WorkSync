@@ -6,17 +6,17 @@ export const login=async(req,res)=>{
 
     const {email,adminId}=req.body;
     try {
-        const user=await adminmodel.findOne({email});
+        const user=await adminmodel.findOne({email, adminId});
         if(!user)
         {
             return res.status(401).send({message:"you are not admin"})
         }
-        const token=jwt.sign({id:user._id},process.env.SECRET_KEY,{expiresIn:'7d'})
+        const token=jwt.sign({id:user._id, role:'admin'},process.env.SECRET_KEY,{expiresIn:'7d'})
         
         res.cookie('token',token ,{
             httpOnly:true,
             secure:process.env.NODE_ENV === 'production',
-            sameSite:process.env.NODE_ENV === 'production'?'none':'strict',
+            sameSite:process.env.NODE_ENV === 'production'?'none':'lax',
             maxAge :7*24*60*60*1000
         })
         

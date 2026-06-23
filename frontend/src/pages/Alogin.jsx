@@ -1,36 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
+import api from '../services/api';
 import rbg from "../assets/registerbg.jpg";
+import { useAuth } from "../context/AuthContext";
 const Alogin = () => {
-   const Navigate=useNavigate()
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
+   const Navigate=useNavigate();
+   const { loginAdmin } = useAuth();
+   const [userId, setUserId] = useState("");
+   const [password, setPassword] = useState("");
+   const [errMsg, setErrMsg] = useState("");
+   const [successMsg, setSuccessMsg] = useState("");
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setErrMsg("");
+    setSuccessMsg("");
     
     try {
-      e.preventDefault();
-      axios.default.withCredentials=true;
-
-      const user={
-        
-        empId:userId,
-        email:password
-      }
-
-      console.log(user);
-      const result=await axios.post('http://localhost:8080/api/admin/login',
-        user,{withCredentials:true}
-      )
+      const result=await api.post('/admin/login', { adminId: userId, email: password });
       console.log(result.data);
+      setSuccessMsg("Logged in successfully! Redirecting...");
+      loginAdmin();
 
-    setTimeout(()=>{
-      Navigate("/admin")
-    },2000)
+      setTimeout(()=>{
+        Navigate("/admin")
+      },2000)
     } catch (error) {
-      console.log("error in adminlogin");
+      console.log("error in adminlogin", error);
+      setErrMsg(error.response?.data?.message || "Invalid credentials. Please try again.");
     }
   };
 
@@ -92,6 +89,16 @@ const Alogin = () => {
                   fontSize: "16px",
                 }}
               />
+              {errMsg && (
+                <div style={{ color: "#ef4444", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+                  {errMsg}
+                </div>
+              )}
+              {successMsg && (
+                <div style={{ color: "#10b981", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+                  {successMsg}
+                </div>
+              )}
               <button
                 type="submit"
                 style={{

@@ -1,42 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import rbg from "../assets/registerbg.jpg";
-import aixos from 'axios'
-import axios from "axios";
+import api from "../services/api";
 
 const Register = () => {
   const Navigate=useNavigate()
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const generateUserId = () => {
-    return "USER" + Math.floor(1000 + Math.random() * 9000);
-  };
+  const [errMsg, setErrMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleRegister = async(e) => {
-    
+    e.preventDefault();
+    setErrMsg("");
+    setSuccessMsg("");
     try {
-      e.preventDefault();
-      axios.defaults.withCredentials=true;
-
-      const user={
-        name:name,
-        email:email,
-        password:password
-      }
-
-      console.log(user);
-      const result=await axios.post('http://localhost:8080/api/authemp/register',
-        user,{withCredentials:true}
-      )
+      const result=await api.post('/authemp/register', { name, email, password });
       console.log(result.data);
+      setSuccessMsg("Registration successful! Redirecting to login...");
 
-    setTimeout(()=>{
-      Navigate("/login")
-    },2000)
+      setTimeout(()=>{
+        Navigate("/login")
+      },2000)
     } catch (error) {
-      console.log("error in registration");
+      console.log("error in registration", error);
+      setErrMsg(error.response?.data?.message || "Registration failed. Please try again.");
     }
     
   };
@@ -113,6 +102,16 @@ const Register = () => {
               fontSize: "16px",
             }}
           />
+          {errMsg && (
+            <div style={{ color: "#ff4444", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+              {errMsg}
+            </div>
+          )}
+          {successMsg && (
+            <div style={{ color: "#28a745", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+              {successMsg}
+            </div>
+          )}
           <button
             type="submit"
             style={{

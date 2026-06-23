@@ -1,42 +1,8 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api";
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:3000/api",
+  withCredentials: true
+});
 
-export const checkIn = (workerId, name) =>
-  axios.post(`${API_URL}/check-in`, { workerId, name });
-
-export const checkOut = (workerId) =>
-  axios.post(`${API_URL}/check-out`, { workerId });
-
-export const getWorkers = () =>
-  axios.get(`${API_URL}/workers`);
-
-export const getEmployeeData = async (employeeId) => {
-  try {
-    const response = await axios.get(`${API_URL}/employee/${employeeId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching employee data", error);
-    return null;
-  }
-};
-
-export const requestLeave = async (employeeId, leaveData) => {
-  try {
-    const response = await axios.post(`${API_URL}/employee/${employeeId}/leave`, leaveData);
-    return response.data;
-  } catch (error) {
-    console.error("Error requesting leave", error);
-    return null;
-  }
-};
-
-export const getAttendanceData = async (filters) => {
-  try {
-    const response = await axios.get(`${API_URL}/attendance`, { params: filters });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching attendance data", error);
-    return [];
-  }
-};
+export default api;

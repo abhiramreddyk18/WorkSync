@@ -5,6 +5,7 @@ import {
   Container, TextField, Button, Box
 } from "@mui/material";
 import Header from "../pages/Header";
+import api from "../services/api";
 
 const Dashboard = () => {
   const [workers, setWorkers] = useState([]);
@@ -17,15 +18,8 @@ const Dashboard = () => {
 
   const fetchWorkers = async (filters = {}) => {
     try {
-      let url = "http://localhost:8080/api/attendence/getattend";
-
-      const params = new URLSearchParams(filters);
-      if (params.toString()) {
-        url += "?" + params.toString();
-      }
-
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await api.get('/attendance/getattend', { params: filters });
+      const data = response.data;
 
       if (Array.isArray(data)) {
         setWorkers(data);
@@ -91,19 +85,27 @@ const Dashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {workers.map((worker, index) => (
-              <TableRow key={index} hover>
-                <TableCell>{worker.empId}</TableCell>
-                <TableCell>{worker.name}</TableCell>
-                <TableCell>{formatDate(worker.InTime)}</TableCell>
-                <TableCell>{worker.hours}</TableCell>
-                <TableCell>${worker.payment}</TableCell>
-                <TableCell>{worker.out ? "Yes" : "No"}</TableCell>
-                <TableCell>{worker.active ? "Yes" : "No"}</TableCell>
-                <TableCell>{formatDate(worker.createdAt)}</TableCell>
-                <TableCell>{formatDate(worker.updatedAt)}</TableCell>
+            {workers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={9} align="center" sx={{ py: 3, color: "#94a3b8" }}>
+                  No attendance records found.
+                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              workers.map((worker, index) => (
+                <TableRow key={index} hover>
+                  <TableCell>{worker.empId}</TableCell>
+                  <TableCell>{worker.name}</TableCell>
+                  <TableCell>{formatDate(worker.InTime)}</TableCell>
+                  <TableCell>{typeof worker.hours === 'number' ? worker.hours.toFixed(2) : worker.hours}</TableCell>
+                  <TableCell>₹{typeof worker.payment === 'number' ? worker.payment.toFixed(2) : worker.payment}</TableCell>
+                  <TableCell>{worker.out ? "Yes" : "No"}</TableCell>
+                  <TableCell>{worker.active ? "Yes" : "No"}</TableCell>
+                  <TableCell>{formatDate(worker.createdAt)}</TableCell>
+                  <TableCell>{formatDate(worker.updatedAt)}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

@@ -1,38 +1,38 @@
 import React, { useState } from "react";
 import rbg from "../assets/registerbg.jpg";
-import axios from 'axios'
+import api from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const Navigate=useNavigate()
+  const { loginEmployee } = useAuth();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setErrMsg("");
+    setSuccessMsg("");
     console.log("User ID:", userId, "Password:", password);
     try {
-      e.preventDefault();
-      axios.default.withCredentials=true;
-
-      const user={
-        
-        empId:userId,
-        password:password
-      }
-
-      console.log(user);
-      const result=await axios.post('http://localhost:8080/api/authemp/login',
-        user,{withCredentials:true}
-      )
+      const result=await api.post('/authemp/login', { empId: userId, password });
       console.log(result.data);
+      
+      // Fetch user details immediately to populate the AuthContext state
+      const userRes = await api.get('/authemp/userdetails');
+      loginEmployee(userRes.data);
 
-    setTimeout(()=>{
-      Navigate("/employee")
-    },2000)
+      setSuccessMsg("Logged in successfully! Redirecting...");
+
+      setTimeout(()=>{
+        Navigate("/employee")
+      },2000)
     } catch (error) {
-      console.log("error in registration");
+      console.log("error in employee login", error);
+      setErrMsg(error.response?.data?.message || "Invalid credentials. Please try again.");
     }
   };
 
@@ -90,6 +90,16 @@ const Login = () => {
             required
             style={inputStyle}
           />
+          {errMsg && (
+            <div style={{ color: "#ff4444", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+              {errMsg}
+            </div>
+          )}
+          {successMsg && (
+            <div style={{ color: "#00ff66", fontWeight: "bold", margin: "10px 0", fontSize: "14px" }}>
+              {successMsg}
+            </div>
+          )}
           <button
             type="submit"
             style={buttonStyle}

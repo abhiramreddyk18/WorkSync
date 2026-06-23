@@ -1,0 +1,17 @@
+/* Responsive overrides */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  .MuiContainer-root {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  h4, h5 {
+    font-size: 1.2rem !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}

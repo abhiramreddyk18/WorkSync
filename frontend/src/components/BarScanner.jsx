@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import Quagga from "quagga";
 import { Button, Box } from "@mui/material";
 
@@ -38,8 +38,8 @@ const BarScanner = ({ page, setPage }) => {
       Quagga.stop(); // Stop scanning after detecting a barcode
 
       try {
-        const response = await axios.post(
-          "http://localhost:8080/api/attendence/scanning",
+        const response = await api.post(
+          "/attendance/scanning",
           { empId: scannedCode }
         );
         console.log("Response:", response.data.message);

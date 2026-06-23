@@ -17,6 +17,7 @@ const userAuth=async(req,res,next)=>{
         if(tokenDecode.id)
         {
             req.body.USER_ID=tokenDecode.id;
+            req.body.USER_ROLE=tokenDecode.role;
 
         }
         else{
@@ -30,3 +31,11 @@ const userAuth=async(req,res,next)=>{
 }
 
 export default userAuth;
+
+export const requireRole = (...roles) => (req, res, next) => {
+    const role = req.body.USER_ROLE;
+    if (!roles.includes(role) && role !== 'admin') {
+        return res.status(403).send({ message: 'Access denied: insufficient permissions' });
+    }
+    next();
+};

@@ -1,32 +1,23 @@
 import React, { useState } from "react";
 import { TextField, Button, Container, Box, Typography, Paper } from "@mui/material";
-import axios from 'axios'
-import { useNavigate } from "react-router-dom";
-
+import api from "../services/api";
 const SendIn = ({ page, setPage }) => {
   const [userId, setUserId] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setMessage("");
+    setError(false);
     
     try {
-      e.preventDefault();
-      axios.default.withCredentials=true;
-
-      const user={
-        
-        empId:userId,
-      }
-
-      console.log(user);
-      const result=await axios.post('http://localhost:8080/api/attendence/incoming',
-        user,{withCredentials:true}
-      )
-      console.log(result.data);
-
-    
-    } catch (error) {
-      console.log("error in adminlogin");
+      const result = await api.post('/attendance/incoming', { empId: userId });
+      setMessage(result.data.message || "Entry information added successfully!");
+      setUserId("");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Check-in failed. Please check User ID.");
+      setError(true);
     }
   };
 
@@ -34,7 +25,7 @@ const SendIn = ({ page, setPage }) => {
     <Container maxWidth="xs" sx={{height:"90vh",width:'100dvw',display:'flex',justifyContent:'center',alignItems:'center'}}>
       <Paper elevation={3} sx={{ padding: 3, mt: 8, textAlign: "center", borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom>
-            SendIn
+            SendIn (Check In)
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
@@ -43,9 +34,15 @@ const SendIn = ({ page, setPage }) => {
             fullWidth
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
+            required
           />
+          {message && (
+            <Typography color={error ? "error" : "success.main"} fontWeight="bold">
+              {message}
+            </Typography>
+          )}
           <Button type="submit" variant="contained" color="primary" fullWidth>
-            Login
+            Submit Entry
           </Button>
           <Button variant="outlined" color="secondary" fullWidth onClick={() => setPage("scanner")}>
             Go to Scanner

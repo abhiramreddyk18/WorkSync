@@ -20,6 +20,7 @@ const employeeschema=mongoose.Schema({
     },
     role:{
         type:String,
+        enum:['worker','hr','manager'],
         default:"worker"
     },
     otpsend:{
@@ -39,6 +40,8 @@ const employeeschema=mongoose.Schema({
     totalLeaves: { type: Number, default: 0 },
     overtimeHours: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
+    shift: { type: String, enum: ['morning', 'evening', 'night', ''], default: '' },
+    shiftStartTime: { type: String, default: '' },
 
 })
 
