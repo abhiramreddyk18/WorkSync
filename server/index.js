@@ -52,6 +52,15 @@ app.use('/api/leaves', leaverouter);
 app.use('/api/emails', emailrouter);
 app.use('/api/ai', airouter);
 
+// Root health check endpoint
+app.get('/', (req, res) => {
+    res.status(200).send({
+        status: "success",
+        message: "🚀 WorkSync Backend API Server is online and running!",
+        timestamp: new Date().toISOString()
+    });
+});
+
 
 const port = process.env.PORT || 8000;
 
