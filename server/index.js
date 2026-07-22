@@ -20,14 +20,24 @@ import { initScheduler } from './services/emailscheduler.js';
 const app=express()
 dotenv.config()
 
-app.use(cors(
-    {
-        origin: "http://localhost:3001", // Allow frontend on Port 3001
-        credentials: true, // Allow cookies
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"]
-      }
-));
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "http://localhost:3000",
+    "http://localhost:3001"
+].filter(Boolean);
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+            callback(null, true);
+        } else {
+            callback(null, true);
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json())
 app.use(cookieParser())
@@ -43,11 +53,20 @@ app.use('/api/emails', emailrouter);
 app.use('/api/ai', airouter);
 
 
-mongodb();
-initShifts();
-initScheduler();
-const port=process.env.PORT ;
+const port = process.env.PORT || 8000;
 
-app.listen(port,()=>{
-    console.log(`Server is running in the Port ${port}`);
-})
+const startServer = async () => {
+    const isConnected = await mongodb();
+    if (isConnected) {
+        await initShifts();
+    } else {
+        console.log("⚠️ Server started in offline-database mode. Connect MongoDB to activate full API features.");
+    }
+    initScheduler();
+    
+    app.listen(port, () => {
+        console.log(`🚀 Server is running on Port ${port}`);
+    });
+};
+
+startServer();

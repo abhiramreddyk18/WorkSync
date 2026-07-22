@@ -7,6 +7,7 @@ const Alogin = () => {
    const Navigate=useNavigate();
    const { loginAdmin } = useAuth();
    const [userId, setUserId] = useState("");
+   const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [errMsg, setErrMsg] = useState("");
    const [successMsg, setSuccessMsg] = useState("");
@@ -17,7 +18,7 @@ const Alogin = () => {
     setSuccessMsg("");
     
     try {
-      const result=await api.post('/admin/login', { adminId: userId, email: password });
+      const result=await api.post('/admin/login', { adminId: userId, email, password });
       console.log(result.data);
       setSuccessMsg("Logged in successfully! Redirecting...");
       loginAdmin();
@@ -60,7 +61,7 @@ const Alogin = () => {
             <form onSubmit={handleSubmit}>
             <input
                 type="text"
-                placeholder="Enter User Id"
+                placeholder="Enter Admin ID"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 required
@@ -76,7 +77,23 @@ const Alogin = () => {
               
               <input
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  margin: "10px 0",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  fontSize: "16px",
+                }}
+              />
+
+              <input
+                type="password"
+                placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

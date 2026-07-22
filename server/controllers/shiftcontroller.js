@@ -11,9 +11,13 @@ const DEFAULT_SHIFTS = [
 ];
 
 export const initShifts = async () => {
-    for (const s of DEFAULT_SHIFTS) {
-        const exists = await shiftmodel.findOne({ name: s.name });
-        if (!exists) await shiftmodel.create(s);
+    try {
+        for (const s of DEFAULT_SHIFTS) {
+            const exists = await shiftmodel.findOne({ name: s.name });
+            if (!exists) await shiftmodel.create(s);
+        }
+    } catch (error) {
+        console.error("⚠️ Skipping shift initialization (Database offline or unreachable).");
     }
 };
 

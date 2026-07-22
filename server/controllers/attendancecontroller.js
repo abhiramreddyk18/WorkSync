@@ -250,9 +250,18 @@ export const outTime=async(req,res)=>{
 }
 
 export const attend=async(req,res)=>{
-    const{empId}=req.body;
     try {
-        const user =await employeemodel.findOne({empId})
+        let empId = req.query.empId || req.body.empId;
+        if (!empId && req.body.USER_ID) {
+            const userDoc = await employeemodel.findById(req.body.USER_ID);
+            if (userDoc) empId = userDoc.empId;
+        }
+
+        if (!empId) {
+            return res.status(400).send({ message: "empId is required" });
+        }
+
+        const user = await employeemodel.findOne({ empId });
         if(!user)
         {
             return res.status(400).send({message:"user not found"});
@@ -260,7 +269,7 @@ export const attend=async(req,res)=>{
         const attendancedata=await attendancemodel.find({empId}).sort({ createdAt: -1 });
         if(attendancedata.length===0)
         {
-            return res.status(400).send({message:"he is new employee"})
+            return res.status(200).send([]);
         }
         return res.status(200).send(attendancedata);
         

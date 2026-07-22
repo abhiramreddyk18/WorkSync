@@ -96,6 +96,17 @@ export const applyLeave = async (req, res) => {
 export const getEmployeeLeaves = async (req, res) => {
     try {
         const { empId } = req.params;
+        const userRole = req.body.USER_ROLE;
+        const userId = req.body.USER_ID;
+
+        // If not an admin/hr/manager, ensure workers can only fetch their own leaves
+        if (!['admin', 'hr', 'manager'].includes(userRole)) {
+            const employee = await employeemodel.findById(userId);
+            if (!employee || employee.empId !== empId) {
+                return res.status(403).send({ message: "Access denied: Cannot view leave history of other employees." });
+            }
+        }
+
         const leaves = await leavemodel.find({ empId }).sort({ createdAt: -1 });
         return res.status(200).send(leaves);
     } catch (error) {

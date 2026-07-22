@@ -3,9 +3,10 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 # Load environment variables from the server directory
-load_dotenv(dotenv_path="../server/.env")
+env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../server/.env"))
+load_dotenv(dotenv_path=env_path, override=True)
 
-MONGO_URI = os.getenv("MONGOURI", "mongodb://localhost:27017/org")
+MONGO_URI = os.getenv("MONGOURI")
 client = MongoClient(MONGO_URI)
 db = client.get_database()
 

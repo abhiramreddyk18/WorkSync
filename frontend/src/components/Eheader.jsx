@@ -7,6 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AIAssistantSidebar from './AIAssistantSidebar';
 
 const navItems = [
     { label: 'My Profile', path: '/employee' },
@@ -68,6 +69,7 @@ function Eheader() {
                     </ListItem>
                 </List>
             </Drawer>
+            <AIAssistantSidebar />
         </>
     );
 }

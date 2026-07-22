@@ -1,16 +1,26 @@
 import express from 'express'
 import adminmodel from '../models/admin.js'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 export const login=async(req,res)=>{
 
-    const {email,adminId}=req.body;
+    const {email,adminId,password}=req.body;
+    if (!email || !adminId || !password) {
+        return res.status(400).send({message:"Email, Admin ID, and password are required"});
+    }
     try {
         const user=await adminmodel.findOne({email, adminId});
         if(!user)
         {
-            return res.status(401).send({message:"you are not admin"})
+            return res.status(401).send({message:"Invalid Admin ID or Email"})
         }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).send({message:"Invalid password"});
+        }
+
         const token=jwt.sign({id:user._id, role:'admin'},process.env.SECRET_KEY,{expiresIn:'7d'})
         
         res.cookie('token',token ,{
@@ -22,7 +32,7 @@ export const login=async(req,res)=>{
         
         return res.status(201).send({message:"enter the organization"})
     } catch (error) {
-        return res.status(400).send({message:"error occur in get attendence details of user"})
+        return res.status(400).send({message:"error occur in admin login", error: error.message})
     }
 };
 

@@ -83,12 +83,16 @@ async function seed() {
         if (!adminExists) {
             const admin = new adminmodel({
                 adminId: 'admin123',
-                email: 'admin@worksync.com'
+                email: 'admin@worksync.com',
+                password: hashPassword
             });
             await admin.save();
-            console.log("Seeded default admin: admin@worksync.com / admin123");
+            console.log("Seeded default admin: admin@worksync.com / admin123 (Password: password123)");
         } else {
-            console.log("Admin admin123 already exists.");
+            // Ensure password is updated
+            adminExists.password = hashPassword;
+            await adminExists.save();
+            console.log("Admin admin123 updated with password hash.");
         }
 
         console.log("Seeding completed successfully.");

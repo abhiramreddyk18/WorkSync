@@ -21,9 +21,10 @@ export const queryAI = async (req, res) => {
             return res.status(401).send({ message: "Authorized profile not found." });
         }
 
-        // Forward payload to Python microservice running on port 5000
+        // Forward payload to Python microservice
+        const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:5000/query';
         try {
-            const pythonResponse = await axios.post('http://127.0.0.1:5000/query', {
+            const pythonResponse = await axios.post(aiServiceUrl, {
                 message,
                 history: history || [],
                 userProfile: {

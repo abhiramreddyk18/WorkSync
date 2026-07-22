@@ -41,14 +41,11 @@ export const register=async(req,res)=>{
         })
 
         
-        const verificationMail={
-            from:process.env.SENDER_EMAIL,
-            to:email,
-            subject:"welcome to JNTU sulthanpur",
-            text:`Welcome to JNTU sulthanpur your account has been created by email id ${email} and otp:${otp}`
+        try {
+            await transporter.sendMail(verificationMail);
+        } catch (mailErr) {
+            console.error('Welcome email sending skipped (SMTP unactivated or error):', mailErr.message);
         }
-
-        await transporter.sendMail(verificationMail);
 
         // Notify admins of the new employee registration
         try {
